@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TheResearchRoomSA — Spotlighting Science, Inspiring Generations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#070a10;--ink-soft:#0f141d;--paper:#f5f2ec;--signal:#4361ff;--signal-glow:#7c93ff;--cell:#00ffbf;--amber:#ffc233;--muted:#828da1;--line:rgba(255,255,255,0.08)}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--ink);color:var(--paper);font-family:'Inter',sans-serif;overflow-x:hidden;line-height:1.5;cursor:none}
+body.intro-lock{overflow:hidden;height:100vh}
+::selection{background:var(--signal);color:#fff}
+a,button{cursor:none}
+#intro{position:fixed;inset:0;z-index:9998;background:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .8s ease,visibility .8s}
+#intro.done{opacity:0;visibility:hidden;pointer-events:none}
+#intro-canvas{position:absolute;inset:0;filter:blur(.3px)}
+.flash{position:absolute;inset:0;background:#fff;opacity:0;z-index:2;pointer-events:none}
+.flash.go{animation:flashPeak .6s ease forwards}
+@keyframes flashPeak{0%{opacity:0}35%{opacity:.85}100%{opacity:0}}
+.shock{position:absolute;top:50%;left:50%;width:10px;height:10px;border-radius:50%;border:2px solid var(--cell);transform:translate(-50%,-50%) scale(0);opacity:0;z-index:2}
+.shock.go{animation:shockwave .7s cubic-bezier(.22,1,.36,1) forwards}
+@keyframes shockwave{0%{opacity:.9;transform:translate(-50%,-50%) scale(0)}100%{opacity:0;transform:translate(-50%,-50%) scale(120)}}
+.intro-name{display:none;position:relative;z-index:3;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(24px,5vw,54px);letter-spacing:-0.01em;color:var(--paper);opacity:0;transition:opacity .4s ease;display:flex}
+.intro-name.show{opacity:1}
+.intro-name .ch{display:inline-block;white-space:pre}
+.intro-sub{position:relative;z-index:3;margin-top:18px;font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--cell);opacity:0;transition:opacity .5s ease .2s}
+.intro-sub.show{opacity:1}
+.skip-btn{position:absolute;bottom:28px;right:32px;z-index:4;background:transparent;border:1px solid var(--line);color:var(--muted);padding:8px 16px;border-radius:100px;font-family:'Space Grotesk',sans-serif;font-size:11px;letter-spacing:.14em;text-transform:uppercase;transition:color .2s,border-color .2s}
+.skip-btn:hover{color:var(--paper);border-color:var(--paper)}
+.cursor-dot,.cursor-ring{position:fixed;top:0;left:0;border-radius:50%;pointer-events:none;z-index:9999;mix-blend-mode:difference}
+.cursor-dot{width:7px;height:7px;background:#fff;transform:translate(-50%,-50%)}
+.cursor-ring{width:38px;height:38px;border:1.5px solid rgba(255,255,255,.6);transform:translate(-50%,-50%);transition:width .25s,height .25s,background .25s,border-color .25s}
+.cursor-ring.hover{width:64px;height:64px;background:rgba(255,255,255,.08);border-color:transparent}
+@media(hover:none){.cursor-dot,.cursor-ring{display:none}body,a,button{cursor:auto}}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:18px 40px;background:rgba(7,10,16,.6);backdrop-filter:blur(16px);border-bottom:1px solid var(--line);transition:padding .3s ease}
+nav .brand{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:18px;letter-spacing:-0.02em;color:var(--paper);text-decoration:none;display:flex;align-items:center;gap:10px}
+nav .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--cell);box-shadow:0 0 12px var(--cell);animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.75)}}
+nav .links{display:flex;align-items:center;gap:30px}
+nav .links a{color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;transition:color .2s;position:relative}
+nav .links a:not(.cta):hover{color:var(--paper)}
+nav .links a:not(.cta)::after{content:'';position:absolute;left:0;bottom:-6px;width:0;height:1px;background:var(--cell);transition:width .25s}
+nav .links a:not(.cta):hover::after{width:100%}
+.cta{background:var(--signal);color:#fff;border:none;padding:11px 22px;border-radius:100px;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13px;letter-spacing:.04em;text-transform:uppercase;text-decoration:none;display:inline-block;position:relative;overflow:hidden;transition:transform .3s cubic-bezier(.22,1,.36,1)}
+.cta span{position:relative;z-index:2}
+.cta::before{content:'';position:absolute;inset:0;background:var(--cell);border-radius:100px;transform:translateY(101%);transition:transform .4s cubic-bezier(.22,1,.36,1);z-index:1}
+.cta:hover::before{transform:translateY(0)}
+.cta:hover{color:var(--ink)}
+.nav-toggle{display:none;background:none;border:none;color:var(--paper);font-size:24px}
+.hero{min-height:100vh;position:relative;display:flex;flex-direction:column;justify-content:center;padding:120px 40px 80px;overflow:hidden}
+#three-hero{position:absolute;inset:0;z-index:0}
+.hero-glow{position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);width:80vw;height:80vw;max-width:900px;max-height:900px;background:radial-gradient(circle,rgba(61,90,255,.16),transparent 60%);z-index:1;pointer-events:none}
+.hero-inner{position:relative;z-index:3;max-width:1200px;margin:0 auto;width:100%}
+.hero-inner>*{opacity:0}
+body.revealed .hero-inner>*{opacity:1}
+body.revealed .hero-inner .eyebrow{animation:fadeUp .8s ease .1s forwards}
+body.revealed .hero-inner h1 .line span{animation:riseIn 1s cubic-bezier(.22,1,.36,1) forwards}
+body.revealed .hero-inner h1 .line:nth-child(2) span{animation-delay:.12s}
+body.revealed .hero-inner h1{opacity:1}
+body.revealed .hero-inner{animation:heroRise 1.1s cubic-bezier(.22,1,.36,1)}
+@keyframes heroRise{from{transform:translateY(40px);filter:blur(6px)}to{transform:none;filter:none}}
+body.revealed .hero-inner .sub{animation:fadeUp .8s ease .5s forwards}
+body.revealed .hero-inner .founders{animation:fadeUp .8s ease .66s forwards}
+body.revealed .hero-inner .hero-actions{animation:fadeUp .8s ease .8s forwards}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--cell);margin-bottom:28px}
+.eyebrow .bar{width:34px;height:1px;background:var(--cell)}
+.hero h1{font-family:'Space Grotesk',sans-serif;font-weight:700;letter-spacing:-0.04em;line-height:.9;font-size:clamp(52px,9vw,138px);margin-bottom:30px}
+.hero h1 .line{display:block;overflow:hidden}
+.hero h1 .line span{display:block;transform:translateY(110%)}
+.hero h1 .accent{background:linear-gradient(100deg,var(--signal-glow),var(--cell));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;background-size:200% auto;animation:shimmer 6s linear infinite}
+@keyframes riseIn{to{transform:translateY(0)}}
+@keyframes shimmer{to{background-position:200% center}}
+.hero .sub{font-family:'Newsreader',serif;font-size:clamp(19px,2.4vw,26px);color:var(--paper);max-width:640px;margin-bottom:16px;line-height:1.4}
+.hero .founders{font-size:15px;color:var(--muted);margin-bottom:40px}
+.hero .founders b{color:var(--paper);font-weight:600}
+.hero-actions{display:flex;gap:16px;flex-wrap:wrap}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.ghost{background:transparent;color:var(--paper);border:1px solid var(--line);padding:11px 22px;border-radius:100px;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13px;letter-spacing:.04em;text-transform:uppercase;text-decoration:none;transition:border-color .3s,background .3s}
+.ghost:hover{border-color:var(--cell);background:rgba(0,224,168,.06)}
+.scroll-hint{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:8px;z-index:3;opacity:0}
+body.revealed .scroll-hint{animation:fadeUp 1s ease 1.1s forwards}
+.scroll-hint .mouse{width:22px;height:34px;border:1px solid var(--muted);border-radius:12px;position:relative}
+.scroll-hint .mouse::after{content:'';position:absolute;top:6px;left:50%;transform:translateX(-50%);width:3px;height:6px;background:var(--cell);border-radius:2px;animation:scrolldot 1.6s infinite}
+@keyframes scrolldot{0%{opacity:1;top:6px}80%{opacity:0;top:16px}100%{opacity:0}}
+section{position:relative;z-index:2}
+.wrap{max-width:1200px;margin:0 auto;padding:0 40px}
+.band{padding:130px 0;position:relative}
+.sec-head{display:flex;align-items:baseline;gap:20px;margin-bottom:56px}
+.sec-num{font-family:'Space Grotesk',sans-serif;font-size:13px;color:var(--signal-glow);font-weight:600;letter-spacing:.1em}
+.sec-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(30px,5vw,56px);letter-spacing:-0.03em;line-height:1}
+.reveal{opacity:0;transform:translateY(46px);transition:opacity .9s ease,transform .9s cubic-bezier(.22,1,.36,1)}
+.reveal.in{opacity:1;transform:none}
+/* STATS */
+.stats{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--ink)}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr)}
+.stat{padding:54px 30px;text-align:center;border-right:1px solid var(--line);position:relative}
+.stat:last-child{border-right:none}
+.stat .num{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(40px,6vw,68px);letter-spacing:-0.03em;line-height:1;background:linear-gradient(135deg,var(--paper),var(--signal-glow));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.stat .num.ph{color:var(--muted);-webkit-text-fill-color:var(--muted);background:none}
+.stat .lbl{margin-top:14px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600;font-family:'Space Grotesk',sans-serif}
+.stat .note{margin-top:6px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);opacity:.7}
+.episodes{background:var(--ink-soft)}
+.ep-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:28px}
+.ep-card{background:var(--ink);border:1px solid var(--line);border-radius:18px;overflow:hidden;transition:transform .4s cubic-bezier(.22,1,.36,1),border-color .4s,box-shadow .4s;display:flex;flex-direction:column;position:relative}
+.ep-card::after{content:'';position:absolute;inset:0;border-radius:18px;background:radial-gradient(500px circle at var(--mx,50%) var(--my,50%),rgba(61,90,255,.12),transparent 40%);opacity:0;transition:opacity .4s;pointer-events:none;z-index:3}
+.ep-card:hover::after{opacity:1}
+.ep-card:hover{transform:translateY(-8px);border-color:rgba(61,90,255,.5);box-shadow:0 30px 60px -20px rgba(61,90,255,.3)}
+.ep-thumb{position:relative;aspect-ratio:16/9;overflow:hidden;background:#000}
+.ep-thumb iframe{width:100%;height:100%;border:0;display:block}
+.ep-body{padding:26px 28px 30px}
+.ep-tag{font-family:'Space Grotesk',sans-serif;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--cell);font-weight:600;margin-bottom:12px;display:block}
+.ep-title{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:22px;letter-spacing:-0.02em;margin-bottom:14px;line-height:1.2}
+.ep-desc{font-size:14.5px;color:var(--muted);line-height:1.6;margin-bottom:20px}
+.ep-topics{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.ep-topic{font-size:11px;letter-spacing:.04em;color:var(--paper);background:rgba(255,255,255,.05);border:1px solid var(--line);padding:5px 11px;border-radius:100px;font-family:'Space Grotesk',sans-serif;font-weight:500}
+.ep-take{border-top:1px solid var(--line);padding-top:18px}
+.ep-take .h{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--signal-glow);font-weight:600;margin-bottom:10px;font-family:'Space Grotesk',sans-serif}
+.ep-take ul{list-style:none}
+.ep-take li{font-size:13.5px;color:var(--muted);line-height:1.5;padding-left:18px;position:relative;margin-bottom:8px}
+.ep-take li::before{content:'';position:absolute;left:0;top:8px;width:6px;height:6px;border-radius:50%;background:var(--cell)}
+.marquee-band{padding:56px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden;background:var(--ink)}
+.marquee{display:flex;white-space:nowrap;will-change:transform;animation:scroll-x 34s linear infinite}
+.marquee span{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(28px,5vw,58px);letter-spacing:-0.02em;color:transparent;-webkit-text-stroke:1px var(--muted);padding:0 30px;display:inline-flex;align-items:center;gap:40px;transition:-webkit-text-stroke .3s,color .3s}
+.marquee span::after{content:'\25CF';-webkit-text-stroke:0;color:var(--signal);font-size:.4em}
+.marquee:hover span{color:var(--cell);-webkit-text-stroke:1px var(--cell)}
+.marquee:hover{animation-play-state:paused}
+@keyframes scroll-x{to{transform:translateX(-50%)}}
+.lineup-list{border-top:1px solid var(--line)}
+.lineup-sub{font-family:'Space Grotesk',sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--signal-glow);font-weight:600;margin:40px 0 4px}
+.lineup-sub:first-child{margin-top:0}
+.lineup-row{display:grid;grid-template-columns:60px 1fr auto;gap:24px;align-items:center;padding:26px 0;border-bottom:1px solid var(--line);transition:padding .4s cubic-bezier(.22,1,.36,1);position:relative;overflow:hidden}
+.lineup-row::before{content:'';position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,rgba(61,90,255,.1),transparent);transition:width .5s cubic-bezier(.22,1,.36,1)}
+.lineup-row:hover::before{width:100%}
+.lineup-row::after{content:'';position:absolute;left:-40px;top:0;bottom:0;width:3px;background:var(--cell);transform:scaleY(0);transform-origin:top;transition:transform .4s}
+.lineup-row:hover::after{transform:scaleY(1)}
+.lineup-row:hover{padding-left:20px}
+.lineup-idx,.lineup-name,.lineup-field,.lineup-status{position:relative;z-index:2}
+.lineup-idx{font-family:'Space Grotesk',sans-serif;font-size:13px;color:var(--muted);font-weight:500}
+.lineup-name{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:clamp(18px,2.5vw,27px);letter-spacing:-0.02em;transition:color .3s}
+.lineup-row:hover .lineup-name{color:var(--cell)}
+.lineup-field{font-size:13px;color:var(--muted);margin-top:4px}
+.lineup-status{font-family:'Space Grotesk',sans-serif;font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:6px 13px;border-radius:100px;font-weight:600;white-space:nowrap}
+.st-published{background:rgba(0,224,168,.12);color:var(--cell);border:1px solid rgba(0,224,168,.3)}
+.st-production{background:rgba(255,176,32,.1);color:var(--amber);border:1px solid rgba(255,176,32,.28)}
+.institutions{background:var(--ink-soft)}
+.inst-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.inst{background:var(--ink);border:1px solid var(--line);border-radius:14px;padding:28px 26px;transition:transform .35s cubic-bezier(.22,1,.36,1),border-color .35s;text-align:center}
+.inst:hover{transform:translateY(-5px);border-color:rgba(0,224,168,.4)}
+.inst .abbr{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:26px;letter-spacing:-0.02em;color:var(--paper);margin-bottom:8px}
+.inst-hint{color:var(--muted);font-size:13px;margin-bottom:22px;letter-spacing:.02em}
+.inst[data-inst]{cursor:pointer;text-align:left}
+.inst-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+.inst-plus{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:24px;color:var(--signal-glow);line-height:1;transition:transform .35s cubic-bezier(.22,1,.36,1);flex-shrink:0}
+.inst.open .inst-plus{transform:rotate(45deg)}
+.inst-desc{max-height:0;overflow:hidden;transition:max-height .5s cubic-bezier(.22,1,.36,1),margin-top .4s,opacity .4s;opacity:0}
+.inst.open .inst-desc{max-height:420px;margin-top:16px;opacity:1}
+.inst-desc p{font-size:14px;color:var(--muted);line-height:1.6}
+.inst.open{border-color:rgba(0,224,168,.4)}
+.inst .full{font-size:12px;color:var(--muted);line-height:1.4}
+.mission-statement{font-family:'Newsreader',serif;font-size:clamp(26px,4.2vw,48px);line-height:1.26;letter-spacing:-0.01em;max-width:980px;font-weight:400}
+.mission-statement .word{display:inline-block;opacity:.18;transition:opacity .5s,color .5s}
+.mission-statement .word.lit{opacity:1}
+.mission-statement .word.em{color:var(--cell);font-style:italic}
+.mission-statement .word.hl{color:var(--signal-glow)}
+.mission-body{margin-top:40px;max-width:620px;font-size:16px;color:var(--muted);line-height:1.7}
+.founders-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+.founder-card{background:var(--ink-soft);border:1px solid var(--line);border-radius:18px;padding:34px 30px;transition:transform .4s cubic-bezier(.22,1,.36,1),border-color .4s;position:relative;overflow:hidden}
+.founder-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--signal),var(--cell));transform:scaleX(0);transform-origin:left;transition:transform .5s cubic-bezier(.22,1,.36,1)}
+.founder-card:hover::before{transform:scaleX(1)}
+.founder-card:hover{transform:translateY(-8px);border-color:rgba(255,255,255,.16)}
+.founder-initial{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:30px;width:60px;height:60px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(61,90,255,.2),rgba(0,224,168,.14));border:1px solid var(--line);margin-bottom:22px;color:var(--paper)}
+.founder-name{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:22px;letter-spacing:-0.02em;margin-bottom:6px}
+.founder-role{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--signal-glow);font-weight:600;margin-bottom:16px;font-family:'Space Grotesk',sans-serif}
+.founder-desc{font-size:14.5px;color:var(--muted);line-height:1.6}
+.involved{background:var(--ink-soft)}
+.involved-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:70px;align-items:start}
+.form-field{margin-bottom:20px}
+.form-field label{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:9px;font-weight:600;font-family:'Space Grotesk',sans-serif}
+.form-field input,.form-field select,.form-field textarea{width:100%;background:var(--ink);border:1px solid var(--line);border-radius:11px;padding:14px 16px;color:var(--paper);font-family:'Inter',sans-serif;font-size:15px;transition:border-color .25s,box-shadow .25s}
+.form-field input:focus,.form-field select:focus,.form-field textarea:focus{outline:none;border-color:var(--signal);box-shadow:0 0 0 3px rgba(61,90,255,.16)}
+.form-field textarea{resize:vertical;min-height:120px}
+.submit-btn{background:var(--signal);color:#fff;border:none;width:100%;padding:16px;border-radius:11px;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px;letter-spacing:.04em;text-transform:uppercase;position:relative;overflow:hidden;transition:transform .3s}
+.submit-btn span{position:relative;z-index:2;transition:color .3s}
+.submit-btn::before{content:'';position:absolute;inset:0;background:var(--cell);transform:translateY(101%);transition:transform .4s cubic-bezier(.22,1,.36,1)}
+.submit-btn:hover::before{transform:translateY(0)}
+.submit-btn:hover span{color:var(--ink)}
+.involved-copy h3{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:20px;margin-bottom:14px;letter-spacing:-0.01em}
+.involved-copy p{color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:30px}
+.contact-block{border-top:1px solid var(--line);padding-top:26px}
+.contact-block .lbl{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--signal-glow);font-weight:600;margin-bottom:10px;font-family:'Space Grotesk',sans-serif}
+.contact-block a{color:var(--paper);text-decoration:none;font-size:17px;font-family:'Space Grotesk',sans-serif;transition:color .2s}
+.contact-block a:hover{color:var(--cell)}
+.contact-block .loc{color:var(--muted);font-size:14px;margin-top:8px}
+footer{background:var(--ink);border-top:1px solid var(--line);padding:70px 0 40px}
+.footer-top{display:flex;justify-content:space-between;align-items:flex-start;gap:40px;flex-wrap:wrap;margin-bottom:50px}
+.footer-brand .tag{font-family:'Newsreader',serif;font-style:italic;font-size:22px;margin-bottom:16px;max-width:340px;line-height:1.3}
+.footer-brand .name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:20px;letter-spacing:-0.02em;display:flex;align-items:center;gap:10px}
+.footer-brand .name .dot{width:8px;height:8px;border-radius:50%;background:var(--cell);box-shadow:0 0 10px var(--cell)}
+.footer-links{display:flex;gap:60px;flex-wrap:wrap}
+.footer-col h4{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;font-weight:600;font-family:'Space Grotesk',sans-serif}
+.footer-col a{display:block;color:var(--paper);text-decoration:none;font-size:14px;margin-bottom:11px;transition:color .2s}
+.footer-col a:hover{color:var(--cell)}
+.footer-bottom{border-top:1px solid var(--line);padding-top:26px;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+.footer-bottom p{color:var(--muted);font-size:13px}
+.footer-bottom .loc{font-family:'Space Grotesk',sans-serif;font-size:13px;color:var(--muted)}
+@media(max-width:860px){
+  body{cursor:auto}a,button{cursor:auto}
+  nav{padding:16px 22px}
+  nav .links{display:none;position:absolute;top:100%;left:0;right:0;background:var(--ink);flex-direction:column;padding:24px;gap:20px;border-bottom:1px solid var(--line)}
+  nav .links.open{display:flex}
+  .nav-toggle{display:block}
+  .wrap{padding:0 22px}
+  .hero{padding:110px 22px 80px}
+  .band{padding:80px 0}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .stat:nth-child(2){border-right:none}
+  .stat:nth-child(1),.stat:nth-child(2){border-bottom:1px solid var(--line)}
+  .ep-grid{grid-template-columns:1fr}
+  .inst-grid{grid-template-columns:repeat(2,1fr)}
+  .founders-grid{grid-template-columns:1fr}
+  .involved-grid{grid-template-columns:1fr;gap:44px}
+  .lineup-row{grid-template-columns:40px 1fr;gap:14px}
+  .lineup-status{grid-column:2;justify-self:start;margin-top:4px}
+  .sec-head{flex-direction:column;gap:8px;margin-bottom:40px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}.hero-inner>*{opacity:1}.hero h1 .line span{transform:none}.mission-statement .word{opacity:1}#intro{display:none}}
+</style>
+</head>
+<body class="intro-lock">
+<div id="intro">
+  <canvas id="intro-canvas"></canvas>
+  <div class="shock" id="shock"></div>
+  <div class="flash" id="flash"></div>
+  <div class="intro-name" id="introName"></div>
+  <div class="intro-sub" id="introSub">Student-run &middot; San Antonio</div>
+  <button class="skip-btn" id="skipBtn">Skip</button>
+</div>
+<div class="cursor-ring" id="cRing"></div>
+<div class="cursor-dot" id="cDot"></div>
+<nav id="nav">
+  <a href="#top" class="brand" data-mag><span class="dot"></span>TheResearchRoomSA</a>
+  <div class="links" id="navlinks">
+    <a href="#episodes">Episodes</a><a href="#lineup">Lineup</a><a href="#mission">Mission</a><a href="#team">Team</a>
+    <a href="#involved" class="cta" data-mag><span>Contact Us</span></a>
+  </div>
+  <button class="nav-toggle" id="navToggle" aria-label="Menu">&#9776;</button>
+</nav>
+<header class="hero" id="top">
+  <div id="three-hero"></div>
+  <div class="hero-glow parallax" data-depth="0.2"></div>
+  <div class="hero-inner">
+    <span class="eyebrow"><span class="bar"></span>Student-run &middot; San Antonio</span>
+    <h1><span class="line"><span>The research</span></span><span class="line"><span class="accent">is happening here.</span></span></h1>
+    <p class="sub">A student-run talk show sitting down with the scientists redefining medicine, biology, and discovery across San Antonio.</p>
+    <p class="founders">Founded by <b>Shriyans Thipparthi</b>, <b>Vijay Vishal</b>, and <b>Vivaan Achar</b> &middot; Health Careers High School</p>
+    <div class="hero-actions">
+      <a href="#episodes" class="cta" data-mag><span>Watch Episodes</span></a>
+      <a href="#involved" class="ghost" data-mag>Suggest a Researcher</a>
+    </div>
+  </div>
+  <div class="scroll-hint"><div class="mouse"></div>Scroll</div>
+</header>
+<section class="stats">
+  <div class="stats-grid">
+    <div class="stat reveal"><div class="num" data-count="7">0</div><div class="lbl">Researchers Featured</div></div>
+    <div class="stat reveal"><div class="num" data-count="4">0</div><div class="lbl">Institutions</div></div>
+    <div class="stat reveal"><div class="num ph">&mdash;</div><div class="lbl">Total Views</div><div class="note">Coming soon</div></div>
+    <div class="stat reveal"><div class="num ph">&mdash;</div><div class="lbl">Episodes</div><div class="note">Coming soon</div></div>
+  </div>
+</section>
+<section class="episodes band" id="episodes">
+  <div class="wrap">
+    <div class="sec-head reveal"><span class="sec-num">01</span><h2 class="sec-title">Latest Episodes</h2></div>
+    <div class="ep-grid">
+      <article class="ep-card reveal" data-tilt>
+        <div class="ep-thumb"><iframe src="https://www.youtube.com/embed/bUs3cZJ4rnQ" title="Dr. Manpreet Semwal" allowfullscreen loading="lazy"></iframe></div>
+        <div class="ep-body">
+          <span class="ep-tag">Ep. 01 &middot; Immunology</span>
+          <h3 class="ep-title">Dr. Manpreet Semwal &mdash; The Thymus, Aging &amp; Immunity</h3>
+          <p class="ep-desc">Assistant Professor of Biology at Our Lady of the Lake University, published in PNAS and Nature Aging. We unpack the organ in your chest that trains your entire immune system and why it starts disappearing at puberty.</p>
+          <div class="ep-topics"><span class="ep-topic">The Thymus</span><span class="ep-topic">Autophagy</span><span class="ep-topic">Immune Aging</span><span class="ep-topic">Autoimmunity</span></div>
+          <div class="ep-take"><div class="h">In this episode</div><ul>
+            <li>Why your immune system runs a "training school" and where it lives</li>
+            <li>The surprising reason thymic cells keep themselves chemically stressed</li>
+            <li>What her PNAS experiment revealed about aging and autoimmunity</li>
+          </ul></div>
+        </div>
+      </article>
+      <article class="ep-card reveal" data-tilt>
+        <div class="ep-thumb"><iframe src="https://www.youtube.com/embed/L1QtaEkty3w" title="Dr. Jennifer Davila" allowfullscreen loading="lazy"></iframe></div>
+        <div class="ep-body">
+          <span class="ep-tag">Ep. 02 &middot; Research Careers</span>
+          <h3 class="ep-title">Dr. Jennifer Davila &mdash; A High Schooler's Guide to Research</h3>
+          <p class="ep-desc">Director of Research Mentoring Initiatives and the MD/PhD program at UT Health San Antonio. A practical roadmap for any student who wants into biomedical research but has no idea where to start.</p>
+          <div class="ep-topics"><span class="ep-topic">MD vs PhD</span><span class="ep-topic">Mentorship</span><span class="ep-topic">Getting Started</span><span class="ep-topic">San Antonio</span></div>
+          <div class="ep-take"><div class="h">In this episode</div><ul>
+            <li>What MD, PhD, and MD/PhD actually mean and how to choose</li>
+            <li>How to find a mentor when no one in your family is in science</li>
+            <li>Why it's never too late to start and why quality beats quantity</li>
+          </ul></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+<div class="marquee-band"><div class="marquee" id="marquee"><span>SAN ANTONIO INNOVATION BIOMEDICAL RESEARCH REAL SCIENTISTS REAL STORIES </span><span>SAN ANTONIO INNOVATION BIOMEDICAL RESEARCH REAL SCIENTISTS REAL STORIES </span></div></div>
+<section class="band" id="lineup">
+  <div class="wrap">
+    <div class="sec-head reveal"><span class="sec-num">02</span><h2 class="sec-title">The Lineup</h2></div>
+    <div class="lineup-list">
+      <div class="lineup-sub reveal">Published</div>
+      <div class="lineup-row reveal"><span class="lineup-idx">01</span><div><div class="lineup-name">Dr. Manpreet Semwal</div><div class="lineup-field">Thymus, aging &amp; immune tolerance &middot; OLLU</div></div><span class="lineup-status st-published">Published</span></div>
+      <div class="lineup-row reveal"><span class="lineup-idx">02</span><div><div class="lineup-name">Dr. Jennifer Davila</div><div class="lineup-field">Research mentorship &amp; MD/PhD pathways &middot; UT Health SA</div></div><span class="lineup-status st-published">Published</span></div>
+      <div class="lineup-sub reveal">In Production</div>
+      <div class="lineup-row reveal"><span class="lineup-idx">03</span><div><div class="lineup-name">Dr. Kurt Retherford</div><div class="lineup-field">NASA Europa Clipper &amp; planetary science &middot; SwRI</div></div><span class="lineup-status st-production">In Production</span></div>
+      <div class="lineup-row reveal"><span class="lineup-idx">04</span><div><div class="lineup-name">Dr. Alexey Soshnev</div><div class="lineup-field">Chromatin, lymphoma &amp; gene regulation &middot; UTSA</div></div><span class="lineup-status st-production">In Production</span></div>
+      <div class="lineup-row reveal"><span class="lineup-idx">05</span><div><div class="lineup-name">Dr. Lacy Barton</div><div class="lineup-field">Germ cells, fertility &amp; development &middot; UTSA</div></div><span class="lineup-status st-production">In Production</span></div>
+      <div class="lineup-row reveal"><span class="lineup-idx">06</span><div><div class="lineup-name">Dr. Leslie Neely</div><div class="lineup-field">Autism, VR &amp; behavioral therapy &middot; UTSA</div></div><span class="lineup-status st-production">In Production</span></div>
+      <div class="lineup-row reveal"><span class="lineup-idx">07</span><div><div class="lineup-name">Dr. Thayne Currie</div><div class="lineup-field">Exoplanets &amp; direct imaging &middot; UTSA</div></div><span class="lineup-status st-production">In Production</span></div>
+    </div>
+  </div>
+</section>
+<section class="institutions band" id="institutions">
+  <div class="wrap">
+    <div class="sec-head reveal"><span class="sec-num">03</span><h2 class="sec-title">Where They Work</h2></div>
+    <p class="inst-hint reveal">Tap any institution to see what its researchers work on.</p>
+    <div class="inst-grid">
+      <div class="inst reveal" data-inst><div class="inst-head"><div><div class="abbr">UTSA</div><div class="full">The University of Texas at San Antonio</div></div><span class="inst-plus">+</span></div><div class="inst-desc"><p>UTSA is a Carnegie R1 "very high research activity" university and one of Texas's fastest-growing research institutions. Its scientists span molecular biology, neuroscience, chromatin and cancer genetics, developmental and regenerative biology, and reproductive science, alongside strong programs in astrophysics, AI, cybersecurity, and behavioral health. Several of our guests run labs here studying everything from gene regulation and lymphoma to exoplanets and autism therapies.</p></div></div>
+      <div class="inst reveal" data-inst><div class="inst-head"><div><div class="abbr">UT Health</div><div class="full">UT Health San Antonio</div></div><span class="inst-plus">+</span></div><div class="inst-desc"><p>UT Health San Antonio is the region's premier academic health center, running over 200 studies a year with an emphasis on translational "bench to bedside" research. Its strengths include cancer (through the NCI-designated Mays Cancer Center and Greehey Children's Cancer Research Institute), longevity and aging at the Barshop Institute, neuroscience, regenerative medicine, diabetes and metabolic disease, infectious disease, and military health. It's also home to the MD/PhD program and mentoring initiatives featured on our show.</p></div></div>
+      <div class="inst reveal" data-inst><div class="inst-head"><div><div class="abbr">SwRI</div><div class="full">Southwest Research Institute</div></div><span class="inst-plus">+</span></div><div class="inst-desc"><p>SwRI is one of the largest independent, nonprofit R&amp;D organizations in the country — around 3,200 staff working across roughly 4,000 active projects "from deep sea to deep space." It's a world leader in space science and spacecraft instrumentation, serving as the principal investigator institution for major NASA missions including Juno, New Horizons, Lucy, and Europa Clipper, while also advancing robotics, AI, fuels and engines, chemistry, and bioengineering.</p></div></div>
+      <div class="inst reveal" data-inst><div class="inst-head"><div><div class="abbr">OLLU</div><div class="full">Our Lady of the Lake University</div></div><span class="inst-plus">+</span></div><div class="inst-desc"><p>OLLU is a small, private Hispanic-Serving Institution in San Antonio built around close, one-to-one mentorship — biology classes are capped so faculty can work individually with students, who have lab access on evenings and weekends for their own research. Its science programs emphasize hands-on undergraduate research and serve as pathways into graduate school, medical school, and the health professions, with faculty who bring active research backgrounds into the classroom.</p></div></div>
+    </div>
+  </div>
+</section>
+<section class="band" id="mission">
+  <div class="wrap">
+    <div class="sec-head reveal"><span class="sec-num">04</span><h2 class="sec-title">Why We Do This</h2></div>
+    <p class="mission-statement" id="missionText">World-class research is happening right here in San Antonio and most students have no idea. We sit down with the scientists behind it and turn their work into conversations anyone can follow.</p>
+    <p class="mission-body reveal">TheResearchRoomSA bridges the gap between cutting-edge biomedical research and the community it serves. We give San Antonio's researchers a platform to share their stories, and we show the next generation of students that the path into science starts closer than they think, in their own city.</p>
+  </div>
+</section>
+<section class="band" id="team">
+  <div class="wrap">
+    <div class="sec-head reveal"><span class="sec-num">05</span><h2 class="sec-title">The Minds Behind It</h2></div>
+    <div class="founders-grid">
+      <article class="founder-card reveal" data-tilt><div class="founder-initial">S</div><h3 class="founder-name">Shriyans Thipparthi</h3><div class="founder-role">Co-Founder &middot; Lead Host</div><p class="founder-desc">Leads the conversations and research prep, focused on humanizing complex biomedical science and drawing out the story behind every discovery.</p></article>
+      <article class="founder-card reveal" data-tilt><div class="founder-initial">V</div><h3 class="founder-name">Vijay Vishal</h3><div class="founder-role">Co-Founder &middot; Technical Director</div><p class="founder-desc">Runs outreach and production, dedicated to spotlighting the researchers shaping the future of medicine across San Antonio.</p></article>
+      <article class="founder-card reveal" data-tilt><div class="founder-initial">V</div><h3 class="founder-name">Vivaan Achar</h3><div class="founder-role">Co-Founder &middot; Creative Lead</div><p class="founder-desc">Shapes the show's voice and storytelling, passionate about turning research into content that inspires the next generation of scientists.</p></article>
+    </div>
+  </div>
+</section>
+<section class="involved band" id="involved">
+  <div class="wrap">
+    <div class="sec-head reveal"><span class="sec-num">06</span><h2 class="sec-title">Contact Us</h2></div>
+    <div class="involved-grid">
+      <form class="reveal" id="involveForm">
+        <div class="form-field"><label for="name">Name</label><input type="text" id="name" name="name" placeholder="Your name" required></div>
+        <div class="form-field"><label for="email">Email</label><input type="email" id="email" name="email" placeholder="you@email.com" required></div>
+        <div class="form-field"><label for="reason">I want to&hellip;</label><select id="reason" name="reason"><option>Suggest a researcher or topic</option><option>Nominate myself as a guest</option><option>Join the student team</option><option>Something else</option></select></div>
+        <div class="form-field"><label for="message">Message</label><textarea id="message" name="message" placeholder="Tell us who we should talk to, or what you have in mind." required></textarea></div>
+        <button type="submit" class="submit-btn" data-mag><span>Send it over</span></button>
+      </form>
+      <div class="involved-copy reveal">
+        <h3>Know a scientist we should feature?</h3>
+        <p>We're always looking for the next researcher whose work deserves a wider audience. Suggest a guest, nominate a topic, or reach out about joining the team, every message reaches the three of us directly.</p>
+        <div class="contact-block"><div class="lbl">Contact</div><a href="mailto:theresearchroomsa@gmail.com" data-mag>theresearchroomsa@gmail.com</a><div class="loc">San Antonio, Texas</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<footer>
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-brand"><div class="tag">Spotlighting science, inspiring generations.</div><div class="name"><span class="dot"></span>TheResearchRoomSA</div></div>
+      <div class="footer-links">
+        <div class="footer-col"><h4>Explore</h4><a href="#episodes">Episodes</a><a href="#lineup">Lineup</a><a href="#mission">Mission</a><a href="#team">Team</a></div>
+        <div class="footer-col"><h4>Connect</h4><a href="https://youtu.be/bUs3cZJ4rnQ" target="_blank" rel="noopener">YouTube</a><a href="mailto:theresearchroomsa@gmail.com">Email</a><a href="#involved">Contact Us</a></div>
+      </div>
+    </div>
+    <div class="footer-bottom"><p>&copy; 2026 TheResearchRoomSA. All rights reserved.</p><span class="loc">San Antonio, Texas</span></div>
+  </div>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+function ssGet(k){try{return sessionStorage.getItem(k)}catch(e){return null}}
+function ssSet(k,v){try{sessionStorage.setItem(k,v)}catch(e){}}
+const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const touch=window.matchMedia('(hover:none)').matches;
+/* ===== INTRO: assemble -> zoom-through -> shockwave ===== */
+function runIntro(){
+  if(!window.THREE){skipIntroImmediate();return;}
+  const intro=document.getElementById('intro');
+  const holder=document.createElement('div');holder.style.position='absolute';holder.style.inset='0';holder.style.zIndex='1';
+  intro.insertBefore(holder,intro.firstChild);
+  const scene=new THREE.Scene();
+  const cam=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,.1,1000);cam.position.z=300;
+  const rend=new THREE.WebGLRenderer({antialias:true,alpha:true});
+  rend.setSize(innerWidth,innerHeight);rend.setPixelRatio(Math.min(devicePixelRatio,2));holder.appendChild(rend.domElement);
+
+  // ---- sample text into points via 2D canvas ----
+  const tc=document.createElement('canvas');const tcx=tc.getContext('2d');
+  const FS=110;tc.width=1400;tc.height=520;
+  tcx.fillStyle='#fff';tcx.font='700 '+FS+'px "Space Grotesk", Arial, sans-serif';tcx.textAlign='center';tcx.textBaseline='middle';
+  // two lines: "TheResearchRoom" / "SA"  (fits nicely)
+  tcx.fillText('TheResearchRoom',tc.width/2,tc.height/2-70);
+  tcx.font='700 170px "Space Grotesk", Arial, sans-serif';
+  tcx.fillText('SA',tc.width/2,tc.height/2+120);
+  const img=tcx.getImageData(0,0,tc.width,tc.height).data;
+  const pts_t=[];const step=6;
+  for(let y=0;y<tc.height;y+=step){for(let x=0;x<tc.width;x+=step){if(img[(y*tc.width+x)*4+3]>128){pts_t.push([(x-tc.width/2)*0.34,-(y-tc.height/2)*0.34,(Math.random()-.5)*8]);}}}
+  const COUNT=pts_t.length;
+  const targets=new Float32Array(COUNT*3),starts=new Float32Array(COUNT*3);
+  for(let i=0;i<COUNT;i++){
+    targets[i*3]=pts_t[i][0];targets[i*3+1]=pts_t[i][1];targets[i*3+2]=pts_t[i][2];
+    const t=Math.acos(2*Math.random()-1),ph=Math.random()*Math.PI*2,rr=260+Math.random()*260;
+    starts[i*3]=rr*Math.sin(t)*Math.cos(ph);starts[i*3+1]=rr*Math.sin(t)*Math.sin(ph);starts[i*3+2]=rr*Math.cos(t);
+  }
+  const geo=new THREE.BufferGeometry();const cur=new Float32Array(starts);
+  geo.setAttribute('position',new THREE.BufferAttribute(cur,3));
+  const mat=new THREE.PointsMaterial({size:1.7,color:0x00ffbf,transparent:true,opacity:.95,blending:THREE.AdditiveBlending});
+  const cloud=new THREE.Points(geo,mat);scene.add(cloud);
+  // firing spark nodes that travel across the formed text
+  const SPARKS=90;const sparkGeo=new THREE.BufferGeometry();const sp=new Float32Array(SPARKS*3);
+  for(let i=0;i<SPARKS;i++){const j=Math.floor(Math.random()*COUNT);sp[i*3]=targets[j*3];sp[i*3+1]=targets[j*3+1];sp[i*3+2]=targets[j*3+2];}
+  sparkGeo.setAttribute('position',new THREE.BufferAttribute(sp,3));
+  const sparkMat=new THREE.PointsMaterial({size:5.5,color:0x7c93ff,transparent:true,opacity:0,blending:THREE.AdditiveBlending});
+  const sparks=new THREE.Points(sparkGeo,sparkMat);scene.add(sparks);
+
+  let t=0,raf,phase=0,done=false;
+  const subEl=document.getElementById('introSub');
+  function frame(){
+    t++;
+    if(phase===0){ // fly into text
+      const prog=Math.min(1,t/160);const e=1-Math.pow(1-prog,3);
+      const a=geo.attributes.position.array;
+      for(let i=0;i<COUNT*3;i++){a[i]=starts[i]+(targets[i]-starts[i])*e;}
+      geo.attributes.position.needsUpdate=true;
+      if(prog>=1){phase=1;t=0;subEl.classList.add('show');}
+    }else if(phase===1){ // hold + fire signals across the text
+      const prog=Math.min(1,t/150);
+      sparkMat.opacity=0.55+0.45*Math.sin(t*0.18);
+      if(t%3===0){const arr=sparkGeo.attributes.position.array;for(let k=0;k<12;k++){const idx=Math.floor(Math.random()*SPARKS);const j=Math.floor(Math.random()*COUNT);arr[idx*3]=targets[j*3];arr[idx*3+1]=targets[j*3+1];arr[idx*3+2]=targets[j*3+2];}sparkGeo.attributes.position.needsUpdate=true;}
+      // gentle breathing
+      cloud.position.y=Math.sin(t*0.04)*2;
+      if(prog>=1){phase=2;t=0;}
+    }else{ // push through + fade
+      const prog=Math.min(1,t/55);const e=prog*prog;
+      cam.position.z=300-e*340;
+      mat.opacity=.95*(1-e*0.7);sparkMat.opacity=(0.5)*(1-e);
+      if(prog>=1){bloomAndReveal();return;}
+    }
+    rend.render(scene,cam);raf=requestAnimationFrame(frame);
+  }
+  function bloomAndReveal(){if(done)return;const fl=document.getElementById('flash');if(fl)fl.classList.add('go');const sh=document.getElementById('shock');if(sh)sh.classList.add('go');setTimeout(finish,650);}
+  function finish(){if(done)return;done=true;cancelAnimationFrame(raf);try{holder.remove();}catch(e){}intro.classList.add('done');document.body.classList.remove('intro-lock');document.body.classList.add('revealed');document.querySelectorAll('.hero-inner>*').forEach(function(el){el.style.opacity='1';el.style.transform='none';});ssSet('trrsa_intro','1');try{countUp();}catch(e){}setTimeout(()=>intro.remove(),1400);}
+  document.getElementById('skipBtn').addEventListener('click',finish);
+  addEventListener('resize',()=>{cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();rend.setSize(innerWidth,innerHeight);});
+  frame();
+}
+function skipIntroImmediate(){try{const intro=document.getElementById('intro');if(intro)intro.remove();}catch(e){}document.body.classList.remove('intro-lock');document.body.classList.add('revealed');document.querySelectorAll('.hero-inner>*').forEach(function(el){el.style.opacity='1';el.style.transform='none';});document.querySelectorAll('.hero h1 .line span').forEach(function(el){el.style.transform='none';});try{countUp();}catch(e){}}
+if(reduced||ssGet('trrsa_intro')){skipIntroImmediate();}else{try{runIntro();}catch(e){skipIntroImmediate();}}
+/* HARD FAILSAFE: never leave the page blank */
+setTimeout(function(){if(document.body.classList.contains('intro-lock')){var el=document.getElementById('intro');if(el)el.remove();document.body.classList.remove('intro-lock');document.body.classList.add('revealed');document.querySelectorAll('.hero-inner>*').forEach(function(el){el.style.opacity='1';el.style.transform='none';});try{countUp();}catch(e){}}},9000);
+/* ===== COUNT UP STATS ===== */
+function countUp(){
+  document.querySelectorAll('.num[data-count]').forEach(el=>{
+    if(el.dataset.done)return;el.dataset.done='1';
+    const target=+el.dataset.count;let c=0;const step=Math.max(1,Math.round(target/30));
+    const iv=setInterval(()=>{c+=step;if(c>=target){c=target;clearInterval(iv);}el.textContent=c;},30);
+  });
+}
+/* ===== CURSOR ===== */
+if(!touch){
+  const dot=document.getElementById('cDot'),ring=document.getElementById('cRing');let mx=innerWidth/2,my=innerHeight/2,rx=mx,ry=my;
+  addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px';});
+  (function loop(){rx+=(mx-rx)*.16;ry+=(my-ry)*.16;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(loop);})();
+  document.querySelectorAll('a,button,[data-mag],.ep-card,.founder-card,.lineup-row,.inst').forEach(el=>{el.addEventListener('mouseenter',()=>ring.classList.add('hover'));el.addEventListener('mouseleave',()=>ring.classList.remove('hover'));});
+  document.querySelectorAll('[data-mag]').forEach(el=>{el.addEventListener('mousemove',e=>{const r=el.getBoundingClientRect();const x=e.clientX-(r.left+r.width/2),y=e.clientY-(r.top+r.height/2);el.style.transform='translate('+(x*.28)+'px,'+(y*.4)+'px)';el.style.transition='transform .1s';});el.addEventListener('mouseleave',()=>{el.style.transform='';el.style.transition='transform .4s cubic-bezier(.22,1,.36,1)';});});
+}
+/* ===== NAV ===== */
+const navToggle=document.getElementById('navToggle'),navLinks=document.getElementById('navlinks');
+navToggle.addEventListener('click',()=>navLinks.classList.toggle('open'));
+navLinks.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>navLinks.classList.remove('open')));
+addEventListener('scroll',()=>{document.getElementById('nav').style.padding=scrollY>40?'12px 40px':'18px 40px';});
+/* ===== REVEAL ===== */
+const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');if(e.target.classList.contains('stat')||e.target.querySelector&&e.target.querySelector('.num[data-count]')){countUp();}io.unobserve(e.target)}})},{threshold:0.14,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.reveal').forEach((el,i)=>{el.style.transitionDelay=(i%4)*0.06+'s';io.observe(el);});
+/* ===== MISSION TYPE ===== */
+const mt=document.getElementById('missionText');
+if(mt){const emWords=['right','here'],hlWords=['no','idea.'];const words=mt.textContent.split(' ');mt.innerHTML=words.map(w=>{let cls='word';if(emWords.includes(w))cls+=' em';if(hlWords.includes(w))cls+=' hl';return '<span class="'+cls+'">'+w+'</span>';}).join(' ');const wEls=mt.querySelectorAll('.word');const litFn=()=>{const r=mt.getBoundingClientRect();const start=innerHeight*.85,end=innerHeight*.25;const prog=Math.min(1,Math.max(0,(start-r.top)/(start-end)));const lit=Math.floor(prog*wEls.length);wEls.forEach((w,i)=>w.classList.toggle('lit',i<lit));};addEventListener('scroll',litFn);litFn();addEventListener('scroll',function once(){countUp();},{once:true});}
+/* ===== PARALLAX ===== */
+if(!reduced){addEventListener('scroll',()=>{const y=scrollY;document.querySelectorAll('.parallax').forEach(el=>{const d=parseFloat(el.dataset.depth||.2);el.style.transform='translateY('+(y*d)+'px)';});});}
+/* ===== CARD GLOW + TILT ===== */
+document.querySelectorAll('.ep-card').forEach(card=>{card.addEventListener('mousemove',e=>{const r=card.getBoundingClientRect();card.style.setProperty('--mx',(e.clientX-r.left)+'px');card.style.setProperty('--my',(e.clientY-r.top)+'px');});});
+if(!touch){document.querySelectorAll('[data-tilt]').forEach(card=>{card.addEventListener('mousemove',e=>{const r=card.getBoundingClientRect();const px=(e.clientX-r.left)/r.width-.5,py=(e.clientY-r.top)/r.height-.5;card.style.transform='translateY(-8px) perspective(900px) rotateY('+(px*4)+'deg) rotateX('+(-py*4)+'deg)';});card.addEventListener('mouseleave',()=>card.style.transform='');});}
+/* ===== FORM ===== */
+document.getElementById('involveForm').addEventListener('submit',function(e){e.preventDefault();const n=document.getElementById('name').value,em=document.getElementById('email').value,r=document.getElementById('reason').value,m=document.getElementById('message').value;const body=encodeURIComponent('Name: '+n+'\nEmail: '+em+'\nReason: '+r+'\n\n'+m);location.href='mailto:theresearchroomsa@gmail.com?subject='+encodeURIComponent('Website: '+r)+'&body='+body;});
+/* ===== INSTITUTION EXPAND ===== */
+document.querySelectorAll('.inst[data-inst]').forEach(function(card){
+  card.addEventListener('click',function(){card.classList.toggle('open');});
+});
+/* ===== THREE HERO ===== */
+if(!reduced&&window.THREE){
+  const mount=document.getElementById('three-hero'),scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,.1,100);cam.position.z=32;
+  const rend=new THREE.WebGLRenderer({antialias:true,alpha:true});rend.setSize(innerWidth,innerHeight);rend.setPixelRatio(Math.min(devicePixelRatio,2));mount.appendChild(rend.domElement);
+  const N=900,geo=new THREE.BufferGeometry(),pos=new Float32Array(N*3),R=18;
+  for(let i=0;i<N;i++){const t=Math.acos(2*Math.random()-1),p=Math.random()*Math.PI*2,rr=R*(.7+Math.random()*.3);pos[i*3]=rr*Math.sin(t)*Math.cos(p);pos[i*3+1]=rr*Math.sin(t)*Math.sin(p);pos[i*3+2]=rr*Math.cos(t);}
+  geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  const pts=new THREE.Points(geo,new THREE.PointsMaterial({size:.16,color:0x00ffbf,transparent:true,opacity:.9}));scene.add(pts);
+  const g2=new THREE.BufferGeometry(),p2=new Float32Array(300*3);
+  for(let i=0;i<300;i++){const t=Math.acos(2*Math.random()-1),p=Math.random()*Math.PI*2,rr=9*(.6+Math.random()*.4);p2[i*3]=rr*Math.sin(t)*Math.cos(p);p2[i*3+1]=rr*Math.sin(t)*Math.sin(p);p2[i*3+2]=rr*Math.cos(t);}
+  g2.setAttribute('position',new THREE.BufferAttribute(p2,3));
+  const inner=new THREE.Points(g2,new THREE.PointsMaterial({size:.2,color:0x7c93ff,transparent:true,opacity:.8}));scene.add(inner);
+  let tx=0,ty=0,sy=0;addEventListener('mousemove',e=>{tx=(e.clientX/innerWidth-.5);ty=(e.clientY/innerHeight-.5);});addEventListener('scroll',()=>sy=scrollY);
+  (function anim(){requestAnimationFrame(anim);pts.rotation.y+=.0012;pts.rotation.x+=.0006;inner.rotation.y-=.002;inner.rotation.x-=.001;cam.position.x+=(tx*8-cam.position.x)*.04;cam.position.y+=(-ty*8-cam.position.y)*.04;cam.position.z=32+sy*.01;cam.lookAt(0,0,0);rend.render(scene,cam);})();
+  addEventListener('resize',()=>{cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();rend.setSize(innerWidth,innerHeight);});
+}
+
+
+</script>
+</body>
+</html>
